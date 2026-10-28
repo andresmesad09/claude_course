@@ -50,6 +50,14 @@ cp .env.example .env
 
 `.env` is not loaded automatically. Use `uv run --env-file .env` to load the dev environment explicitly.
 
+### Log format
+
+Console and file logs share a compact format, with no milliseconds and 3-letter levels (`TRC`, `DBG`, `INF`, `SUC`, `WRN`, `ERR`, `CRT`):
+
+```
+2026-10-26 14:03:12 | INF | second_brain.app:main:29 | Hello from second_brain!
+```
+
 ## Testing
 
 Run the tests:
