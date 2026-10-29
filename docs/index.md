@@ -4,7 +4,7 @@ Welcome to the **second-brain** documentation.
 
 ## Overview
 
-second-brain is a Python application.
+second-brain is a command-line tool for capturing quick thoughts as plain markdown notes.
 
 ## Quick Links
 

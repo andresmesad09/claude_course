@@ -17,22 +17,23 @@
 
 ## Usage
 
-Run via the CLI entrypoint:
+Save a quick thought as a markdown note:
 
 ```bash
-uv run second_brain
+uv run second_brain new "My brilliant idea about caching"
+# Saved /Users/me/second_brain/2026-10-28-143012-my-brilliant-idea-about-caching.md
 ```
 
-Run with the dev environment:
+Each note is a plain markdown file named `YYYY-MM-DD-HHMMSS-<slug>.md`. It contains the first line of the thought as a heading, followed by the full text. Existing notes are never overwritten: a name that's already taken gets a `-2`, `-3`, … suffix.
 
-```bash
-uv run --env-file .env second_brain
-```
+Run `second_brain` without a command, or with `--help`, to list the available commands.
+
+Exit codes: `0` means the note was saved, `2` means a usage error (such as an empty thought), and `1` means an unexpected error, in which case the traceback is logged.
 
 Run as a Python module:
 
 ```bash
-uv run python -m second_brain
+uv run python -m second_brain new "Another idea"
 ```
 
 ## Environment Variables
@@ -43,19 +44,20 @@ uv run python -m second_brain
 cp .env.example .env
 ```
 
-| Variable    | Default   | Description                                                      |
-|-------------|-----------|------------------------------------------------------------------|
-| `LOG_LEVEL` | `INFO`    | Console log level. Set to `DEBUG` in `.env` for verbose output.  |
-| `LOG_FILE`  | `app.log` | Path to the log file.                                            |
+| Variable           | Default          | Description                                                      |
+|--------------------|------------------|------------------------------------------------------------------|
+| `SECOND_BRAIN_DIR` | `~/second_brain` | Folder notes are saved in. `~` is expanded, and missing folders are created. |
+| `LOG_LEVEL`        | `INFO`           | Console log level. Set to `DEBUG` in `.env` for verbose output.  |
+| `LOG_FILE`         | `app.log`        | Path to the log file.                                            |
 
-`.env` is not loaded automatically. Use `uv run --env-file .env` to load the dev environment explicitly.
+`.env` is loaded automatically from the current working directory. Variables that are already set in your shell take priority over values in `.env`.
 
 ### Log format
 
 Console and file logs share a compact format, with no milliseconds and 3-letter levels (`TRC`, `DBG`, `INF`, `SUC`, `WRN`, `ERR`, `CRT`):
 
 ```
-2026-10-26 14:03:12 | INF | second_brain.app:main:29 | Hello from second_brain!
+2026-10-26 14:03:12 | DBG | second_brain.app:new:77 | Saved note /Users/me/second_brain/2026-10-26-140312-idea.md
 ```
 
 ## Testing
