@@ -1,6 +1,11 @@
 import sys
+from datetime import datetime
 
+import click
+from dotenv import find_dotenv, load_dotenv
 from loguru import logger
+
+from second_brain.notes import notes_dir, save_note
 
 LEVEL_ABBREVIATIONS = {
     "TRACE": "TRC",
@@ -40,7 +45,7 @@ def configure_logging():
     - File handler at DEBUG level writing to LOG_FILE (default: app.log)
 
     Both handlers use the compact LOG_FORMAT, e.g.
-    ``2026-10-26 14:03:12 | INF | second_brain.app:main:29 | Hello``.
+    ``2026-10-26 14:03:12 | DBG | second_brain.app:new:77 | Saved note ...``.
     """
     import os
 
@@ -54,14 +59,29 @@ def configure_logging():
     )
 
 
+@click.group()
+def cli():
+    """Second brain: capture quick thoughts as markdown."""
+    load_dotenv(find_dotenv(usecwd=True))
+    configure_logging()
+
+
+@cli.command()
+@click.argument("text")
+def new(text):
+    """Save TEXT as a new markdown note."""
+    try:
+        path = save_note(text, notes_dir(), datetime.now())
+    except ValueError as exc:
+        raise click.UsageError(str(exc)) from exc
+    logger.debug("Saved note {}", path)
+    click.echo(f"Saved {path}")
+
+
 @logger.catch
 def main():
-    """Run the application.
-
-    Configures logging and prints a greeting to verify the setup works.
-    """
-    configure_logging()
-    logger.info("Hello from second_brain!")
+    """Run the CLI, logging any unexpected exception with a traceback."""
+    cli()
 
 
 if __name__ == "__main__":
