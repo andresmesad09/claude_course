@@ -28,6 +28,8 @@ Each note is a plain markdown file named `YYYY-MM-DD-HHMMSS-<slug>.md`. It conta
 
 Run `second_brain` without a command, or with `--help`, to list the available commands.
 
+Exit codes: `0` means the note was saved, `2` means a usage error (such as an empty thought), and `1` means an unexpected error, in which case the traceback is logged.
+
 Run as a Python module:
 
 ```bash

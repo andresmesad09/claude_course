@@ -45,6 +45,7 @@ uv run second_brain new "My brilliant idea about caching"
   ```
 
 - **Empty thoughts:** an empty or whitespace-only thought is rejected with a usage error (exit code 2), and no file is created.
+- **Errors:** if a note can't be saved, for example because `SECOND_BRAIN_DIR` points to a file, the traceback is logged and the command exits with code 1.
 
 ## Environment Variables
 

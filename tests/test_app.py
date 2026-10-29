@@ -106,6 +106,22 @@ def test_main_runs_cli(monkeypatch, tmp_path):
     assert len(list((tmp_path / "notes").iterdir())) == 1
 
 
+def test_main_exits_non_zero_when_save_fails(monkeypatch, tmp_path, capfd):
+    not_a_folder = tmp_path / "not_a_folder"
+    not_a_folder.touch()
+    monkeypatch.setenv("SECOND_BRAIN_DIR", str(not_a_folder))
+    monkeypatch.setattr("sys.argv", ["second_brain", "new", "idea"])
+    with pytest.raises(SystemExit) as exc_info:
+        main()
+    assert exc_info.value.code == 1
+    captured = capfd.readouterr()
+    assert "Saved" not in captured.out
+    assert "FileExistsError" in captured.err
+    assert captured.err.count("Traceback") == 1
+    log = (tmp_path / "test.log").read_text()
+    assert re.search(r"\| ERR \|", log)
+
+
 def test_save_is_logged_at_debug(runner, tmp_path):
     result = runner.invoke(cli, ["new", "idea"])
     assert result.exit_code == 0, result.output

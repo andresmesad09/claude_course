@@ -78,9 +78,16 @@ def new(text):
     click.echo(f"Saved {path}")
 
 
-@logger.catch
+def _exit_with_error(_exc):
+    sys.exit(1)
+
+
+@logger.catch(onerror=_exit_with_error)
 def main():
-    """Run the CLI, logging any unexpected exception with a traceback."""
+    """Run the CLI, logging any unexpected exception with a traceback.
+
+    After logging, exits with code 1 so callers can tell the run failed.
+    """
     cli()
 
 
