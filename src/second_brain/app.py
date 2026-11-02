@@ -5,7 +5,7 @@ import click
 from dotenv import find_dotenv, load_dotenv
 from loguru import logger
 
-from second_brain.notes import notes_dir, save_note
+from second_brain.notes import list_notes, notes_dir, save_note
 
 LEVEL_ABBREVIATIONS = {
     "TRACE": "TRC",
@@ -76,6 +76,19 @@ def new(text):
         raise click.UsageError(str(exc)) from exc
     logger.debug("Saved note {}", path)
     click.echo(f"Saved {path}")
+
+
+@cli.command("list")
+def list_command():
+    """List saved notes, newest first."""
+    directory = notes_dir().resolve()
+    notes = list_notes(directory)
+    logger.debug("Listed {} notes", len(notes))
+    click.echo(f"Notes in {directory}:")
+    if not notes:
+        click.echo("No notes yet.")
+    for number, path in enumerate(notes, start=1):
+        click.echo(f"{number}. {click.format_filename(path.name)}")
 
 
 def _exit_with_error(_exc):
