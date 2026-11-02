@@ -225,3 +225,83 @@ def test_builtin_list_is_not_shadowed():
     import second_brain.app as app
 
     assert "list" not in vars(app)
+
+
+SHOW_ERROR = "No note #{n}. You have {m}. Run 'second_brain list' to see them."
+
+
+def test_show_prints_exact_content(runner, tmp_path):
+    notes = tmp_path / "notes"
+    notes.mkdir()
+    (notes / "2026-10-28-143012-older.md").write_text("# Older\n\nOlder\n")
+    (notes / "2026-10-31-091500-newer.md").write_text("# Newer\n\nNewer\n")
+    result = runner.invoke(cli, ["show", "1"])
+    assert result.exit_code == 0, result.output
+    assert result.stdout == "# Newer\n\nNewer\n"
+    result = runner.invoke(cli, ["show", "2"])
+    assert result.stdout == "# Older\n\nOlder\n"
+
+
+def test_show_number_matches_list(runner, tmp_path):
+    _make_notes(
+        tmp_path / "notes", ["2026-01-01-000000-a.md", "2026-02-01-000000-b.md"]
+    )
+    second_line = runner.invoke(cli, ["list"]).stdout.splitlines()[2]
+    assert second_line == "2. 2026-01-01-000000-a.md"
+    (tmp_path / "notes" / "2026-01-01-000000-a.md").write_text("A\n")
+    assert runner.invoke(cli, ["show", "2"]).stdout == "A\n"
+
+
+def test_new_then_show_round_trip(runner):
+    runner.invoke(cli, ["new", "Round trip"])
+    result = runner.invoke(cli, ["show", "1"])
+    assert result.exit_code == 0, result.output
+    assert result.stdout == "# Round trip\n\nRound trip\n"
+
+
+def test_show_adds_missing_trailing_newline_once(runner, tmp_path):
+    notes = tmp_path / "notes"
+    notes.mkdir()
+    (notes / "2026-10-31-091500-hand.md").write_text("no newline")
+    assert runner.invoke(cli, ["show", "1"]).stdout == "no newline\n"
+
+
+def test_show_replaces_invalid_utf8(runner, tmp_path):
+    notes = tmp_path / "notes"
+    notes.mkdir()
+    (notes / "2026-10-31-091500-latin.md").write_bytes(b"caf\xe9\n")
+    result = runner.invoke(cli, ["show", "1"])
+    assert result.exit_code == 0, result.output
+    assert result.stdout == "caf�\n"
+
+
+def test_show_out_of_range(runner, tmp_path):
+    _make_notes(tmp_path / "notes", ["2026-01-01-000000-a.md"])
+    result = runner.invoke(cli, ["show", "9"])
+    assert result.exit_code == 2
+    assert result.stdout == ""
+    assert SHOW_ERROR.format(n=9, m="1 note") in result.output
+
+
+def test_show_with_no_notes(runner):
+    result = runner.invoke(cli, ["show", "1"])
+    assert result.exit_code == 2
+    assert result.stdout == ""
+    assert SHOW_ERROR.format(n=1, m="0 notes") in result.output
+
+
+@pytest.mark.parametrize(
+    "args", [["show", "0"], ["show", "abc"], ["show", "-1"], ["show"]]
+)
+def test_show_rejects_invalid_numbers(runner, args):
+    result = runner.invoke(cli, args)
+    assert result.exit_code == 2
+    assert result.stdout == ""
+
+
+def test_show_is_in_help(runner):
+    group_help = runner.invoke(cli, ["--help"]).output
+    assert re.search(r"^\s+show\s+Print note NUMBER", group_help, re.M)
+    show_help = runner.invoke(cli, ["show", "--help"])
+    assert show_help.exit_code == 0
+    assert "NUMBER" in show_help.output

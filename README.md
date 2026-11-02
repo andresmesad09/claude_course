@@ -37,9 +37,20 @@ uv run second_brain list
 
 Only markdown files directly in the notes folder are listed. Hidden files and subfolders are skipped. If there are no notes yet, `list` prints `No notes yet.` and doesn't create the folder.
 
+Print a note to the terminal by its number from `list`:
+
+```bash
+uv run second_brain show 2
+# # My brilliant idea about caching
+#
+# My brilliant idea about caching
+```
+
+`show` prints only the note's content, so you can pipe it (`second_brain show 2 | pbcopy`). Numbers follow `list`, newest first, so they shift by one whenever you save a new note. A number with no matching note gives a usage error.
+
 Run `second_brain` without a command, or with `--help`, to list the available commands.
 
-Exit codes: `0` means success (the note was saved or listed), `2` means a usage error (such as an empty thought), and `1` means an unexpected error, in which case the traceback is logged.
+Exit codes: `0` means success (the note was saved, listed or shown), `2` means a usage error (such as an empty thought or an unknown note number), and `1` means an unexpected error, in which case the traceback is logged.
 
 Run as a Python module:
 

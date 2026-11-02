@@ -79,3 +79,11 @@ def list_notes(directory):
         if path.is_file() and not path.name.startswith(".")
     ]
     return sorted(notes, key=lambda path: path.name, reverse=True)
+
+
+def note_by_number(directory, number):
+    """Return note ``number`` (1-based, as shown by ``list``), or None."""
+    notes = list_notes(directory)
+    if 1 <= number <= len(notes):
+        return notes[number - 1]
+    return None
