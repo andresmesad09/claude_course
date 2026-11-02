@@ -155,3 +155,73 @@ def test_works_without_dotenv(runner, tmp_path):
     assert not (tmp_path / ".env").exists()
     result = runner.invoke(cli, ["new", "idea"])
     assert result.exit_code == 0, result.output
+
+
+def _make_notes(directory, names):
+    directory.mkdir(parents=True, exist_ok=True)
+    for name in names:
+        (directory / name).write_text("x")
+
+
+def test_list_shows_path_and_numbered_notes_newest_first(runner, tmp_path):
+    notes = tmp_path / "notes"
+    _make_notes(
+        notes,
+        ["2026-10-28-143012-my-brilliant-idea.md", "2026-10-31-091500-another.md"],
+    )
+    result = runner.invoke(cli, ["list"])
+    assert result.exit_code == 0, result.output
+    assert result.stdout == (
+        f"Notes in {notes.resolve()}:\n"
+        "1. 2026-10-31-091500-another.md\n"
+        "2. 2026-10-28-143012-my-brilliant-idea.md\n"
+    )
+
+
+def test_list_with_missing_folder(runner, tmp_path):
+    notes = tmp_path / "notes"
+    result = runner.invoke(cli, ["list"])
+    assert result.exit_code == 0, result.output
+    assert result.stdout == f"Notes in {notes.resolve()}:\nNo notes yet.\n"
+    assert not notes.exists()
+
+
+def test_list_with_empty_folder(runner, tmp_path):
+    notes = tmp_path / "notes"
+    notes.mkdir()
+    result = runner.invoke(cli, ["list"])
+    assert result.exit_code == 0, result.output
+    assert result.stdout == f"Notes in {notes.resolve()}:\nNo notes yet.\n"
+
+
+def test_list_shows_absolute_path_for_relative_dir(runner, tmp_path, monkeypatch):
+    monkeypatch.setenv("SECOND_BRAIN_DIR", "relative_notes")
+    result = runner.invoke(cli, ["list"])
+    assert result.exit_code == 0, result.output
+    first_line = result.stdout.splitlines()[0]
+    assert first_line == f"Notes in {(tmp_path / 'relative_notes').resolve()}:"
+
+
+def test_new_then_list_round_trip(runner):
+    runner.invoke(cli, ["new", "Fresh thought"])
+    result = runner.invoke(cli, ["list"])
+    assert result.exit_code == 0, result.output
+    assert re.search(
+        r"^1\. \d{4}-\d{2}-\d{2}-\d{6}-fresh-thought\.md$",
+        result.stdout,
+        re.MULTILINE,
+    )
+
+
+def test_list_is_in_help(runner):
+    group_help = runner.invoke(cli, ["--help"]).output
+    assert re.search(r"^\s+list\s+List saved notes, newest first\.", group_help, re.M)
+    list_help = runner.invoke(cli, ["list", "--help"])
+    assert list_help.exit_code == 0
+    assert "Usage:" in list_help.output
+
+
+def test_builtin_list_is_not_shadowed():
+    import second_brain.app as app
+
+    assert "list" not in vars(app)

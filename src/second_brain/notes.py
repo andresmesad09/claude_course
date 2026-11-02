@@ -63,3 +63,19 @@ def save_note(text, directory, now):
         except FileExistsError:
             path = directory / f"{base.stem}-{suffix}{base.suffix}"
             suffix += 1
+
+
+def list_notes(directory):
+    """Return the markdown notes in directory, newest first.
+
+    Only top-level, non-hidden ``*.md`` files count. A missing folder
+    yields an empty list and is not created.
+    """
+    if not directory.is_dir():
+        return []
+    notes = [
+        path
+        for path in directory.glob("*.md")
+        if path.is_file() and not path.name.startswith(".")
+    ]
+    return sorted(notes, key=lambda path: path.name, reverse=True)

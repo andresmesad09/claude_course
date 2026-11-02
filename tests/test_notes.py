@@ -5,6 +5,7 @@ import pytest
 
 from second_brain.notes import (
     DEFAULT_DIR_NAME,
+    list_notes,
     note_filename,
     notes_dir,
     render_note,
@@ -100,3 +101,47 @@ def test_notes_dir_expands_tilde(monkeypatch, tmp_path):
     monkeypatch.setenv("HOME", str(tmp_path))
     monkeypatch.setenv("SECOND_BRAIN_DIR", "~/brain")
     assert notes_dir() == Path(tmp_path) / "brain"
+
+
+def test_list_notes_newest_first(tmp_path):
+    for name in [
+        "2026-10-28-143012-b.md",
+        "2026-10-31-091500-c.md",
+        "2026-01-01-000000-a.md",
+    ]:
+        (tmp_path / name).write_text("x")
+    assert [p.name for p in list_notes(tmp_path)] == [
+        "2026-10-31-091500-c.md",
+        "2026-10-28-143012-b.md",
+        "2026-01-01-000000-a.md",
+    ]
+
+
+def test_list_notes_only_top_level_visible_markdown_files(tmp_path):
+    (tmp_path / "2026-10-28-143012-note.md").write_text("x")
+    (tmp_path / "notes.txt").write_text("x")
+    (tmp_path / ".DS_Store").write_text("x")
+    (tmp_path / ".hidden.md").write_text("x")
+    (tmp_path / "._2026-10-28-143012-note.md").write_text("x")
+    (tmp_path / "folder.md").mkdir()
+    (tmp_path / "sub").mkdir()
+    (tmp_path / "sub" / "2026-10-29-000000-nested.md").write_text("x")
+    assert [p.name for p in list_notes(tmp_path)] == ["2026-10-28-143012-note.md"]
+
+
+def test_list_notes_missing_folder_is_empty_and_not_created(tmp_path):
+    missing = tmp_path / "missing"
+    assert list_notes(missing) == []
+    assert not missing.exists()
+
+
+def test_list_notes_empty_folder(tmp_path):
+    assert list_notes(tmp_path) == []
+
+
+def test_list_notes_same_second_duplicate_sorts_below_original(tmp_path):
+    # Known, accepted quirk (see #5): "-" sorts before ".", so the newer
+    # "-2" duplicate of a same-second note is listed below the original.
+    first = save_note("same", tmp_path, NOW)
+    second = save_note("same", tmp_path, NOW)
+    assert list_notes(tmp_path) == [first, second]

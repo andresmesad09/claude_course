@@ -13,9 +13,10 @@ uv sync
 Via the CLI entrypoint:
 
 ```bash
-uv run second_brain             # list available commands
-uv run second_brain --help      # same, exits with code 0
-uv run second_brain new --help  # help for a single command
+uv run second_brain              # show available commands (new, list)
+uv run second_brain --help       # same, exits with code 0
+uv run second_brain new --help   # help for a single command
+uv run second_brain list         # list saved notes, newest first
 ```
 
 Or as a Python module:
@@ -46,6 +47,21 @@ uv run second_brain new "My brilliant idea about caching"
 
 - **Empty thoughts:** an empty or whitespace-only thought is rejected with a usage error (exit code 2), and no file is created.
 - **Errors:** if a note can't be saved, for example because `SECOND_BRAIN_DIR` points to a file, the traceback is logged and the command exits with code 1.
+
+## Listing Notes
+
+```bash
+uv run second_brain list
+# Notes in /Users/me/second_brain:
+# 1. 2026-10-31-091500-another-idea.md
+# 2. 2026-10-28-143012-my-brilliant-idea-about-caching.md
+```
+
+- **Path:** the first line shows the notes folder as an absolute path, even when `SECOND_BRAIN_DIR` is relative or uses `~`.
+- **Order:** newest first, based on the timestamp in each file name, so editing a note doesn't move it.
+- **What counts as a note:** only `*.md` files directly in the folder. Hidden files (such as `.DS_Store` or `._note.md`), subfolders and other file types are skipped.
+- **No notes:** if the folder is missing or empty, `list` prints `No notes yet.` and exits with code 0. The folder isn't created; that happens on the first `new`.
+- **Same-second duplicates:** if the same thought is saved twice within one second, the `-2` copy is listed below the original, because `-` sorts before `.`.
 
 ## Environment Variables
 

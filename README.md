@@ -26,9 +26,20 @@ uv run second_brain new "My brilliant idea about caching"
 
 Each note is a plain markdown file named `YYYY-MM-DD-HHMMSS-<slug>.md`. It contains the first line of the thought as a heading, followed by the full text. Existing notes are never overwritten: a name that's already taken gets a `-2`, `-3`, … suffix.
 
+See which notes you have, newest first:
+
+```bash
+uv run second_brain list
+# Notes in /Users/me/second_brain:
+# 1. 2026-10-31-091500-another-idea.md
+# 2. 2026-10-28-143012-my-brilliant-idea-about-caching.md
+```
+
+Only markdown files directly in the notes folder are listed. Hidden files and subfolders are skipped. If there are no notes yet, `list` prints `No notes yet.` and doesn't create the folder.
+
 Run `second_brain` without a command, or with `--help`, to list the available commands.
 
-Exit codes: `0` means the note was saved, `2` means a usage error (such as an empty thought), and `1` means an unexpected error, in which case the traceback is logged.
+Exit codes: `0` means success (the note was saved or listed), `2` means a usage error (such as an empty thought), and `1` means an unexpected error, in which case the traceback is logged.
 
 Run as a Python module:
 
