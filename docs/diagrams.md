@@ -161,7 +161,7 @@ flowchart LR
     group_cb ~~~ a_help
 ```
 
-`cli()` is a Click group, and its callback only runs when a command runs. `--help` and plain `second_brain` print the help without loading `.env` or setting up logging. `show 0`, `show abc` and `show -1` are rejected by Click before anything runs, also with exit code 2.
+`cli()` is a Click group, and its callback runs whenever a command is given, before that command's arguments are checked. `--help`, plain `second_brain` and unknown commands print help or an error without loading `.env` or setting up logging. A command's own `--help`, such as `new --help`, still runs the callback first. `show 0`, `show abc` and `show -1` are rejected by Click before `show()` runs, also with exit code 2.
 
 ## 3. Example User Flow
 
