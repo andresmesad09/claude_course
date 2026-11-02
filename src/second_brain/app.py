@@ -5,7 +5,7 @@ import click
 from dotenv import find_dotenv, load_dotenv
 from loguru import logger
 
-from second_brain.notes import list_notes, notes_dir, save_note
+from second_brain.notes import list_notes, note_by_number, notes_dir, save_note
 
 LEVEL_ABBREVIATIONS = {
     "TRACE": "TRC",
@@ -89,6 +89,26 @@ def list_command():
         click.echo("No notes yet.")
     for number, path in enumerate(notes, start=1):
         click.echo(f"{number}. {click.format_filename(path.name)}")
+
+
+@cli.command()
+@click.argument("number", type=click.IntRange(min=1))
+def show(number):
+    """Print note NUMBER, as numbered by `second_brain list`."""
+    directory = notes_dir().resolve()
+    path = note_by_number(directory, number)
+    if path is None:
+        count = len(list_notes(directory))
+        noun = "note" if count == 1 else "notes"
+        raise click.UsageError(
+            f"No note #{number}. You have {count} {noun}. "
+            "Run 'second_brain list' to see them."
+        )
+    logger.debug("Showing note {}", path)
+    content = path.read_text(encoding="utf-8", errors="replace")
+    if not content.endswith("\n"):
+        content += "\n"
+    click.echo(content, nl=False)
 
 
 def _exit_with_error(_exc):

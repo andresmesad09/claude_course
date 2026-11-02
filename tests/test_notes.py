@@ -6,6 +6,7 @@ import pytest
 from second_brain.notes import (
     DEFAULT_DIR_NAME,
     list_notes,
+    note_by_number,
     note_filename,
     notes_dir,
     render_note,
@@ -145,3 +146,31 @@ def test_list_notes_same_second_duplicate_sorts_below_original(tmp_path):
     first = save_note("same", tmp_path, NOW)
     second = save_note("same", tmp_path, NOW)
     assert list_notes(tmp_path) == [first, second]
+
+
+def _three_notes(directory):
+    names = [
+        "2026-01-01-000000-a.md",
+        "2026-10-28-143012-b.md",
+        "2026-10-31-091500-c.md",
+    ]
+    for name in names:
+        (directory / name).write_text("x")
+
+
+def test_note_by_number_matches_list_order(tmp_path):
+    _three_notes(tmp_path)
+    assert note_by_number(tmp_path, 1).name == "2026-10-31-091500-c.md"
+    assert note_by_number(tmp_path, 3).name == "2026-01-01-000000-a.md"
+
+
+def test_note_by_number_out_of_range(tmp_path):
+    _three_notes(tmp_path)
+    assert note_by_number(tmp_path, 4) is None
+
+
+def test_note_by_number_empty_and_missing_folder(tmp_path):
+    assert note_by_number(tmp_path, 1) is None
+    missing = tmp_path / "missing"
+    assert note_by_number(missing, 1) is None
+    assert not missing.exists()

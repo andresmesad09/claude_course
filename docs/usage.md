@@ -13,10 +13,11 @@ uv sync
 Via the CLI entrypoint:
 
 ```bash
-uv run second_brain              # show available commands (new, list)
+uv run second_brain              # show available commands (new, list, show)
 uv run second_brain --help       # same, exits with code 0
 uv run second_brain new --help   # help for a single command
 uv run second_brain list         # list saved notes, newest first
+uv run second_brain show 2       # print note 2 from the list
 ```
 
 Or as a Python module:
@@ -62,6 +63,23 @@ uv run second_brain list
 - **What counts as a note:** only `*.md` files directly in the folder. Hidden files (such as `.DS_Store` or `._note.md`), subfolders and other file types are skipped.
 - **No notes:** if the folder is missing or empty, `list` prints `No notes yet.` and exits with code 0. The folder isn't created; that happens on the first `new`.
 - **Same-second duplicates:** if the same thought is saved twice within one second, the `-2` copy is listed below the original, because `-` sorts before `.`.
+
+## Showing a Note
+
+```bash
+uv run second_brain show 2
+# # My brilliant idea about caching
+#
+# My brilliant idea about caching
+```
+
+- **Numbering:** `NUMBER` is the number shown by `second_brain list`, newest first, with the same filtering. Numbers shift by one whenever a new note is saved, so run `list` again if in doubt.
+- **Output:** the note's content exactly as stored, with no header and no file name, so it can be piped, e.g. `second_brain show 2 | pbcopy`. If a hand-written note doesn't end with a newline, one is added so your prompt starts on a new line.
+- **Encoding:** notes are read as UTF-8. Bytes that aren't valid UTF-8 are shown as `�` instead of crashing.
+- **Errors (exit code 2):**
+  - a number with no matching note: `No note #9. You have 5 notes. Run 'second_brain list' to see them.`
+  - `0`, negative or non-numeric values (`Invalid value for 'NUMBER': 0 is not in the range x>=1.`)
+  - a missing `NUMBER`
 
 ## Environment Variables
 
