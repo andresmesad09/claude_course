@@ -1,0 +1,1135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Second Brain Tour</title>
+<style>
+  :root {
+    --bg: #fbf8f3;
+    --surface: #ffffff;
+    --surface-2: #f3eee6;
+    --text: #1f1d1a;
+    --muted: #6b645a;
+    --border: #e6dfd3;
+    --shadow: 0 1px 2px rgba(60, 50, 30, .06), 0 8px 24px rgba(60, 50, 30, .08);
+
+    --brain: #db2777;
+    --new: #16a34a;
+    --list: #2563eb;
+    --show: #9333ea;
+    --help: #ea580c;
+
+    --app: #0d9488;
+    --notes: #c026d3;
+    --main: #ca8a04;
+    --init: #78716c;
+    --disk: #475569;
+    --you: #db2777;
+
+    --ok: #16a34a;
+    --warn: #d97706;
+    --bad: #dc2626;
+
+    --term-bg: #18171c;
+    --term-text: #e9e7e3;
+    --term-muted: #8f8a83;
+    --term-green: #4ade80;
+    --term-red: #f87171;
+    --term-blue: #93c5fd;
+    --term-yellow: #fcd34d;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #141317;
+      --surface: #1d1c21;
+      --surface-2: #26252b;
+      --text: #ecebe8;
+      --muted: #a19d96;
+      --border: #34323a;
+      --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .35);
+      --brain: #f472b6;
+      --new: #4ade80;
+      --list: #60a5fa;
+      --show: #c084fc;
+      --help: #fb923c;
+      --app: #2dd4bf;
+      --notes: #e879f9;
+      --main: #facc15;
+      --init: #a8a29e;
+      --disk: #94a3b8;
+      --you: #f472b6;
+      --ok: #4ade80;
+      --warn: #fbbf24;
+      --bad: #f87171;
+      --term-bg: #0e0d11;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #141317;
+    --surface: #1d1c21;
+    --surface-2: #26252b;
+    --text: #ecebe8;
+    --muted: #a19d96;
+    --border: #34323a;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .35);
+    --brain: #f472b6;
+    --new: #4ade80;
+    --list: #60a5fa;
+    --show: #c084fc;
+    --help: #fb923c;
+    --app: #2dd4bf;
+    --notes: #e879f9;
+    --main: #facc15;
+    --init: #a8a29e;
+    --disk: #94a3b8;
+    --you: #f472b6;
+    --ok: #4ade80;
+    --warn: #fbbf24;
+    --bad: #f87171;
+    --term-bg: #0e0d11;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 16px/1.55 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  code, pre, .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+  code { font-size: .9em; background: var(--surface-2); padding: .1em .35em; border-radius: 5px; }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 0 16px; }
+  section { padding: 56px 0 24px; }
+  h2 { font-size: clamp(1.5rem, 3.5vw, 2rem); margin: 0 0 6px; letter-spacing: -.01em; }
+  h2 .emoji { margin-right: .3em; }
+  .lead { color: var(--muted); margin: 0 0 24px; max-width: 62ch; }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+  }
+
+  /* ---------- Hero ---------- */
+  .hero { padding: 64px 0 32px; text-align: center; }
+  .brain {
+    font-size: 84px; line-height: 1; display: inline-block;
+    animation: bob 3.2s ease-in-out infinite;
+    filter: drop-shadow(0 8px 16px color-mix(in srgb, var(--brain) 30%, transparent));
+  }
+  @keyframes bob { 50% { transform: translateY(-8px) rotate(-4deg); } }
+  .hero h1 {
+    font-size: clamp(2.2rem, 7vw, 3.6rem); margin: 12px 0 4px; letter-spacing: -.03em;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+  .hero h1 span { color: var(--brain); }
+  .hero p { font-size: 1.15rem; color: var(--muted); margin: 0 auto 32px; max-width: 46ch; }
+  .steps { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; align-items: stretch; }
+  .step {
+    --c: var(--new);
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    width: 190px; padding: 18px 14px;
+    background: var(--surface); border: 2px solid color-mix(in srgb, var(--c) 35%, var(--border));
+    border-radius: 18px; box-shadow: var(--shadow);
+    transition: transform .2s, border-color .2s;
+  }
+  .step:hover, .step:focus-visible { transform: translateY(-4px) rotate(-1deg); border-color: var(--c); outline: none; }
+  .step .ico { font-size: 34px; }
+  .step b { font-size: 1.05rem; }
+  .step code { color: var(--c); background: color-mix(in srgb, var(--c) 12%, transparent); }
+  .step small { color: var(--muted); }
+  .arrow { align-self: center; font-size: 24px; color: var(--muted); }
+  @media (max-width: 680px) { .arrow { display: none; } .step { width: calc(50% - 6px); } }
+
+  /* ---------- Terminal ---------- */
+  .term {
+    background: var(--term-bg); color: var(--term-text);
+    border-radius: 14px; overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .25);
+    border: 1px solid rgba(255, 255, 255, .06);
+  }
+  .term-bar { display: flex; align-items: center; gap: 7px; padding: 10px 14px; background: rgba(255, 255, 255, .05); }
+  .dot { width: 12px; height: 12px; border-radius: 50%; }
+  .dot:nth-child(1) { background: #ff5f57; } .dot:nth-child(2) { background: #febc2e; } .dot:nth-child(3) { background: #28c840; }
+  .term-title { margin-left: 8px; font-size: 12px; color: var(--term-muted); }
+  .term pre { margin: 0; padding: 16px 18px; font-size: 14px; line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
+  .prompt { color: var(--term-green); }
+  .t-dim { color: var(--term-muted); }
+
+  /* help terminal with clickable lines */
+  .help-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: 24px; align-items: start; }
+  @media (max-width: 860px) { .help-grid { grid-template-columns: 1fr; } }
+  .hl {
+    --c: var(--help);
+    display: inline; background: none; border: 0; padding: 1px 4px; margin: 0 -4px;
+    border-radius: 6px; text-align: left; color: inherit; font: inherit;
+    box-shadow: inset 0 -2px 0 color-mix(in srgb, var(--c) 70%, transparent);
+    transition: background .15s;
+  }
+  .hl:hover, .hl:focus-visible { background: color-mix(in srgb, var(--c) 30%, transparent); outline: none; }
+  .hl .k { color: var(--c); font-weight: 700; filter: brightness(1.35); }
+  .legend-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+  .legend-list li { display: flex; gap: 12px; align-items: flex-start; padding: 12px 14px; }
+  .legend-list .ico { font-size: 22px; line-height: 1.2; }
+  .legend-list b { display: block; }
+  .legend-list span { color: var(--muted); font-size: .95rem; }
+  .callout { margin-top: 16px; padding: 12px 14px; border-radius: 12px; background: var(--surface-2); color: var(--muted); font-size: .95rem; }
+
+  /* ---------- Playground ---------- */
+  .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+  .tab {
+    --c: var(--new);
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 9px 16px; border-radius: 999px;
+    background: var(--surface); border: 2px solid var(--border);
+    font-weight: 600; transition: all .15s;
+  }
+  .tab:hover { border-color: color-mix(in srgb, var(--c) 60%, var(--border)); }
+  .tab[aria-selected="true"] { background: var(--c); border-color: var(--c); color: #fff; transform: translateY(-1px); }
+  :root[data-theme="dark"] .tab[aria-selected="true"] { color: #111; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .tab[aria-selected="true"] { color: #111; } }
+  .tab code { background: none; padding: 0; color: inherit; }
+
+  .play-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
+  @media (max-width: 860px) { .play-grid { grid-template-columns: 1fr; } }
+  .panel { --c: var(--new); padding: 22px; border-top: 6px solid var(--c); }
+  .panel[hidden] { display: none; }
+  .panel-head { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+  .panel-head .ico { font-size: 34px; }
+  .panel-head h3 { margin: 0; font-size: 1.35rem; font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+  .panel-head h3 em { font-style: normal; color: var(--c); }
+  .usage { font-size: .88rem; color: var(--muted); }
+  .panel p { margin: 8px 0; }
+  .field { display: flex; gap: 8px; margin: 14px 0 8px; flex-wrap: wrap; }
+  .field input {
+    flex: 1 1 180px; min-width: 0; padding: 10px 12px; border-radius: 10px;
+    border: 2px solid var(--border); background: var(--bg); color: var(--text); font: inherit;
+  }
+  .field input:focus { outline: none; border-color: var(--c); }
+  .btn {
+    --c: var(--new);
+    padding: 10px 16px; border-radius: 10px; border: 0; background: var(--c); color: #fff; font-weight: 700;
+    box-shadow: 0 3px 0 color-mix(in srgb, var(--c) 60%, #000);
+    transition: transform .1s, box-shadow .1s;
+  }
+  :root[data-theme="dark"] .btn:not(.ghost) { color: #111; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .btn:not(.ghost) { color: #111; } }
+  .btn:active { transform: translateY(3px); box-shadow: none; }
+  .btn.ghost { background: var(--surface-2); color: var(--text); box-shadow: none; font-weight: 600; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip {
+    --c: var(--muted);
+    padding: 3px 10px; border-radius: 999px; font-size: .85rem;
+    border: 1px solid color-mix(in srgb, var(--c) 40%, var(--border));
+    background: color-mix(in srgb, var(--c) 10%, transparent);
+  }
+  button.chip:hover { background: color-mix(in srgb, var(--c) 22%, transparent); }
+  .try-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 6px 0 4px; font-size: .9rem; color: var(--muted); }
+
+  .preview { margin-top: 14px; display: grid; gap: 8px; }
+  .fname { font-size: .85rem; word-break: break-all; }
+  .fname .slug { color: var(--c); font-weight: 700; }
+  .paper {
+    position: relative; padding: 16px 18px 18px; border-radius: 4px 14px 14px 14px;
+    background: #fffdf5; color: #2b2720; border: 1px solid #eadfc4;
+    box-shadow: 2px 3px 0 #eadfc4; transform: rotate(-.6deg);
+    font-size: .9rem; min-height: 90px; white-space: pre-wrap; word-break: break-word;
+  }
+  .paper .h1 { font-weight: 800; font-size: 1.05rem; color: #7a3e00; }
+  .paper.empty { color: #a39a86; font-style: italic; }
+
+  .outcomes { list-style: none; padding: 0; margin: 16px 0 0; display: grid; gap: 6px; }
+  .outcomes li { display: flex; gap: 10px; align-items: baseline; font-size: .93rem; }
+  .exit { flex: none; font-size: .75rem; font-weight: 800; padding: 2px 8px; border-radius: 999px; font-family: ui-monospace, Menlo, monospace; }
+  .exit.e0 { background: color-mix(in srgb, var(--ok) 18%, transparent); color: var(--ok); }
+  .exit.e2 { background: color-mix(in srgb, var(--warn) 20%, transparent); color: var(--warn); }
+  .exit.e1 { background: color-mix(in srgb, var(--bad) 18%, transparent); color: var(--bad); }
+  .tip { margin-top: 14px; padding: 10px 12px; border-radius: 10px; background: color-mix(in srgb, var(--c) 9%, transparent); font-size: .92rem; }
+
+  .side { display: grid; gap: 18px; }
+  #demo pre { height: 300px; overflow-y: auto; }
+  .t-in { display: flex; align-items: center; gap: 8px; padding: 10px 18px 14px; border-top: 1px solid rgba(255, 255, 255, .07); }
+  .t-in input { flex: 1; min-width: 0; background: transparent; border: 0; color: var(--term-text); font: 14px ui-monospace, Menlo, monospace; outline: none; }
+  .t-err { color: var(--term-red); }
+  .t-ok { color: var(--term-green); }
+  .t-pill { display: inline-block; font-size: 11px; padding: 0 7px; border-radius: 999px; margin: 2px 0 10px; }
+  .t-pill.p0 { background: rgba(74, 222, 128, .15); color: var(--term-green); }
+  .t-pill.p2 { background: rgba(252, 211, 77, .15); color: var(--term-yellow); }
+  .t-pill.p127 { background: rgba(248, 113, 113, .15); color: var(--term-red); }
+
+  .folder { padding: 16px 18px; }
+  .folder-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+  .folder-head .ico { font-size: 28px; }
+  .folder-head b { font-family: ui-monospace, Menlo, monospace; font-size: .95rem; }
+  .folder-head .count { margin-left: auto; color: var(--muted); font-size: .85rem; }
+  .files { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+  .note {
+    width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 10px;
+    border-radius: 10px; border: 1px solid var(--border); background: var(--bg); text-align: left;
+    font: 13px ui-monospace, Menlo, monospace; transition: transform .15s, border-color .15s;
+  }
+  .note:hover, .note:focus-visible { border-color: var(--show); transform: translateX(3px); outline: none; }
+  .note .num {
+    flex: none; width: 26px; height: 26px; border-radius: 8px; display: grid; place-items: center;
+    background: color-mix(in srgb, var(--list) 16%, transparent); color: var(--list); font-weight: 800;
+  }
+  .note .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .note.pop { animation: pop .7s cubic-bezier(.2, 1.6, .4, 1); border-color: var(--new); }
+  @keyframes pop { 0% { transform: scale(.6) translateY(-20px); opacity: 0; } 100% { transform: none; opacity: 1; } }
+  .empty-folder { color: var(--muted); font-style: italic; padding: 8px 2px; }
+  .folder-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+  .folder-actions .btn { padding: 6px 12px; font-size: .85rem; }
+
+  /* ---------- Settings ---------- */
+  .settings { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  @media (max-width: 760px) { .settings { grid-template-columns: 1fr; } }
+  .setting { padding: 18px; }
+  .setting .ico { font-size: 28px; }
+  .setting code { display: inline-block; margin: 6px 0 2px; font-weight: 700; }
+  .setting p { margin: 4px 0 0; color: var(--muted); font-size: .93rem; }
+  .exit-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 16px; }
+  @media (max-width: 760px) { .exit-row { grid-template-columns: 1fr; } }
+  .exit-card { padding: 16px 18px; display: flex; gap: 12px; align-items: flex-start; }
+  .exit-card .big { font-size: 26px; }
+  .exit-card p { margin: 2px 0 0; color: var(--muted); font-size: .92rem; }
+
+  /* ---------- Code explorer ---------- */
+  .code-grid { display: grid; grid-template-columns: 300px 1fr; gap: 24px; align-items: start; }
+  @media (max-width: 820px) { .code-grid { grid-template-columns: 1fr; } }
+  .tree-card { padding: 16px 12px; }
+  .tree, .tree ul { list-style: none; margin: 0; padding: 0; }
+  .tree ul { margin-left: 18px; padding-left: 12px; border-left: 2px dashed var(--border); }
+  .node {
+    --c: var(--muted);
+    width: 100%; display: flex; align-items: center; gap: 10px; margin: 3px 0; padding: 8px 10px;
+    border: 2px solid transparent; border-radius: 12px; background: none; text-align: left;
+    transition: background .15s, border-color .15s, transform .15s;
+  }
+  .node:hover, .node:focus-visible { background: color-mix(in srgb, var(--c) 10%, transparent); outline: none; }
+  .node[aria-pressed="true"] { border-color: var(--c); background: color-mix(in srgb, var(--c) 14%, transparent); }
+  .node .ico { font-size: 20px; }
+  .node .nm { font: 600 14px ui-monospace, Menlo, monospace; }
+  .node .ln { margin-left: auto; font-size: .75rem; color: var(--muted); }
+  .node.tracing { animation: ring 1s ease-out infinite; border-color: var(--c); }
+  @keyframes ring {
+    0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--c) 55%, transparent); }
+    100% { box-shadow: 0 0 0 10px transparent; }
+  }
+  .tree-note { margin: 12px 4px 0; font-size: .82rem; color: var(--muted); }
+
+  .detail { --c: var(--app); padding: 22px; border-left: 6px solid var(--c); animation: fadein .25s ease; }
+  @keyframes fadein { from { opacity: 0; transform: translateY(6px); } }
+  .detail-head { display: flex; align-items: center; gap: 14px; }
+  .detail-head .big { font-size: 40px; }
+  .detail-head h3 { margin: 0; font: 800 1.35rem ui-monospace, Menlo, monospace; color: var(--c); }
+  .detail-head .role { margin: 0; color: var(--muted); }
+  .detail-head .ln { margin-left: auto; font-size: .8rem; color: var(--muted); white-space: nowrap; }
+  .detail h4 { margin: 18px 0 8px; font-size: .78rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+  .fns { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+  .fns li { display: grid; grid-template-columns: minmax(0, 13.5em) 1fr; gap: 10px; font-size: .92rem; align-items: baseline; }
+  @media (max-width: 520px) { .fns li { grid-template-columns: 1fr; gap: 0; } }
+  .fns code { color: var(--c); background: color-mix(in srgb, var(--c) 10%, transparent); justify-self: start; }
+  .detail details { margin-top: 18px; }
+  .detail summary { cursor: pointer; font-weight: 600; }
+  .detail pre {
+    margin: 10px 0 0; padding: 14px 16px; border-radius: 12px; overflow-x: auto;
+    background: var(--term-bg); color: var(--term-text); font-size: 13px; line-height: 1.55;
+  }
+
+  .trace { margin-top: 24px; padding: 20px; }
+  .trace-top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+  .trace-top b { margin-right: 4px; }
+  .trace-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 4px; align-items: center; }
+  .trace-steps li { display: flex; align-items: center; gap: 4px; }
+  .trace-steps li + li::before { content: "→"; color: var(--muted); margin-right: 2px; }
+  .tstep {
+    --c: var(--app);
+    padding: 5px 10px; border-radius: 9px; font: 12.5px ui-monospace, Menlo, monospace;
+    border: 1.5px solid color-mix(in srgb, var(--c) 45%, var(--border));
+    background: color-mix(in srgb, var(--c) 8%, transparent);
+    transition: all .2s;
+  }
+  .tstep small { display: block; font-size: 10px; opacity: .75; }
+  .tstep.on { background: var(--c); color: #fff; border-color: var(--c); transform: translateY(-3px) scale(1.05); }
+  :root[data-theme="dark"] .tstep.on { color: #111; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .tstep.on { color: #111; } }
+  .tstep.done { opacity: .6; }
+  .trace-caption {
+    margin: 16px 0 0; padding: 12px 14px; min-height: 3.4em; border-radius: 12px;
+    background: var(--surface-2); font-size: .97rem;
+  }
+
+  .theme-toggle {
+    position: fixed; top: 12px; right: 12px; z-index: 10;
+    width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--border);
+    background: var(--surface); box-shadow: var(--shadow); font-size: 18px;
+  }
+  footer { padding: 40px 0 56px; text-align: center; color: var(--muted); font-size: .9rem; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+    html { scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body>
+<button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark mode">🌓</button>
+
+<header class="hero wrap">
+  <div class="brain" aria-hidden="true">🧠</div>
+  <h1><span>second</span>_brain</h1>
+  <p>Got a thought? Type it in your terminal and it becomes a plain markdown note you can find and read again later.</p>
+  <div class="steps">
+    <button class="step" data-go="new" style="--c: var(--new)">
+      <span class="ico">✍️</span><b>Capture</b><code>new "…"</code><small>save a thought</small>
+    </button>
+    <span class="arrow" aria-hidden="true">➜</span>
+    <button class="step" data-go="list" style="--c: var(--list)">
+      <span class="ico">📋</span><b>Find</b><code>list</code><small>see your notes, numbered</small>
+    </button>
+    <span class="arrow" aria-hidden="true">➜</span>
+    <button class="step" data-go="show" style="--c: var(--show)">
+      <span class="ico">👀</span><b>Read</b><code>show 1</code><small>print one note</small>
+    </button>
+  </div>
+</header>
+
+<main>
+  <!-- ======================= --help ======================= -->
+  <section id="help" class="wrap">
+    <h2><span class="emoji">🛟</span>It all starts with <code>--help</code></h2>
+    <p class="lead">This is the real output of <code>second_brain --help</code>. Every underlined bit is clickable: pick one to try it in the playground below.</p>
+    <div class="help-grid">
+      <div class="term">
+        <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="term-title">~ zsh</span></div>
+<pre><span class="prompt">$</span> second_brain --help
+Usage: second_brain [OPTIONS] COMMAND [ARGS]...
+
+  Second brain: capture quick thoughts as markdown.
+
+Options:
+  <button class="hl" data-go="help" style="--c: var(--help)"><span class="k">--help</span>  Show this message and exit.</button>
+
+Commands:
+  <button class="hl" data-go="list" style="--c: var(--list)"><span class="k">list</span>  List saved notes, newest first.</button>
+  <button class="hl" data-go="new" style="--c: var(--new)"><span class="k">new</span>   Save TEXT as a new markdown note.</button>
+  <button class="hl" data-go="show" style="--c: var(--show)"><span class="k">show</span>  Print note NUMBER, as numbered by `second_brain list`.</button></pre>
+      </div>
+      <div>
+        <ul class="legend-list">
+          <li class="card"><span class="ico">✍️</span><div><b><code>new TEXT</code></b><span>Turns your text into a markdown file in your notes folder.</span></div></li>
+          <li class="card"><span class="ico">📋</span><div><b><code>list</code></b><span>Shows where the notes live, numbered newest first.</span></div></li>
+          <li class="card"><span class="ico">👀</span><div><b><code>show NUMBER</code></b><span>Prints a note, using the number from <code>list</code>.</span></div></li>
+          <li class="card"><span class="ico">🛟</span><div><b><code>--help</code></b><span>Works on every command too, e.g. <code>second_brain new --help</code>.</span></div></li>
+        </ul>
+        <div class="callout">💡 <b>UPPERCASE words</b> in a usage line, like <code>TEXT</code> and <code>NUMBER</code>, are the values you fill in. <code>[OPTIONS]</code> in brackets are optional.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= Playground ======================= -->
+  <section id="play" class="wrap">
+    <h2><span class="emoji">🎮</span>Try it in a pretend terminal</h2>
+    <p class="lead">Nothing here touches your computer. It's a pretend notes folder that behaves like the real app, error messages included. Use the buttons, or type commands straight into the terminal.</p>
+
+    <div class="tabs" role="tablist" aria-label="Commands">
+      <button class="tab" role="tab" id="tab-new" aria-controls="panel-new" data-tab="new" style="--c: var(--new)">✍️ <code>new</code></button>
+      <button class="tab" role="tab" id="tab-list" aria-controls="panel-list" data-tab="list" style="--c: var(--list)">📋 <code>list</code></button>
+      <button class="tab" role="tab" id="tab-show" aria-controls="panel-show" data-tab="show" style="--c: var(--show)">👀 <code>show</code></button>
+      <button class="tab" role="tab" id="tab-help" aria-controls="panel-help" data-tab="help" style="--c: var(--help)">🛟 <code>--help</code></button>
+    </div>
+
+    <div class="play-grid">
+      <div>
+        <!-- new -->
+        <div class="panel card" role="tabpanel" id="panel-new" aria-labelledby="tab-new" style="--c: var(--new)">
+          <div class="panel-head"><span class="ico">✍️</span><div><h3>new <em>TEXT</em></h3><div class="usage mono">second_brain new [OPTIONS] TEXT</div></div></div>
+          <p>Save a quick thought. Wrap it in quotes so the whole sentence counts as <b>one</b> <code>TEXT</code>.</p>
+          <form class="field" id="newForm">
+            <input id="newText" type="text" autocomplete="off" value="Buy a keyboard!" aria-label="Your thought">
+            <button class="btn" type="submit" style="--c: var(--new)">💾 Save note</button>
+          </form>
+          <div class="preview">
+            <div class="fname mono" id="newName"></div>
+            <div class="paper mono" id="newPaper"></div>
+          </div>
+          <ul class="outcomes">
+            <li><span class="exit e0">exit 0</span><span>Prints <code>Saved /path/to/the/note.md</code></span></li>
+            <li><span class="exit e2">exit 2</span><span>Empty or blank text: <i>A note can't be empty.</i></span></li>
+            <li><span class="exit e2">exit 2</span><span>Forgot the quotes, so the extra words become <i>unexpected extra arguments</i>.</span></li>
+          </ul>
+          <div class="tip">🛡️ <b>Never overwrites.</b> If two notes get the same name in the same second, the second one becomes <code>…-2.md</code>.</div>
+        </div>
+
+        <!-- list -->
+        <div class="panel card" role="tabpanel" id="panel-list" aria-labelledby="tab-list" style="--c: var(--list)" hidden>
+          <div class="panel-head"><span class="ico">📋</span><div><h3>list</h3><div class="usage mono">second_brain list [OPTIONS]</div></div></div>
+          <p>Shows the full path of your notes folder and a numbered list of notes, <b>newest first</b>. Those numbers are what <code>show</code> uses.</p>
+          <div class="field">
+            <button class="btn" id="runList" style="--c: var(--list)">▶ Run list</button>
+          </div>
+          <ul class="outcomes">
+            <li><span class="exit e0">exit 0</span><span><code>Notes in /…/second_brain:</code> followed by <code>1. …</code>, <code>2. …</code></span></li>
+            <li><span class="exit e0">exit 0</span><span>No notes yet? It says <i>No notes yet.</i> and doesn't create the folder.</span></li>
+          </ul>
+          <div class="tip">🙈 Only <code>*.md</code> files directly in the folder count. Hidden files like <code>.DS_Store</code> and subfolders are skipped.</div>
+        </div>
+
+        <!-- show -->
+        <div class="panel card" role="tabpanel" id="panel-show" aria-labelledby="tab-show" style="--c: var(--show)" hidden>
+          <div class="panel-head"><span class="ico">👀</span><div><h3>show <em>NUMBER</em></h3><div class="usage mono">second_brain show [OPTIONS] NUMBER</div></div></div>
+          <p>Prints one note exactly as it's stored. Get the number from <code>list</code>, or click a note in the folder.</p>
+          <form class="field" id="showForm">
+            <input id="showNum" type="text" inputmode="numeric" autocomplete="off" value="1" aria-label="Note number">
+            <button class="btn" type="submit" style="--c: var(--show)">▶ Show note</button>
+          </form>
+          <div class="try-row">Try a mistake:
+            <button class="chip" data-show="99" style="--c: var(--show)">99</button>
+            <button class="chip" data-show="0" style="--c: var(--show)">0</button>
+            <button class="chip" data-show="abc" style="--c: var(--show)">abc</button>
+          </div>
+          <ul class="outcomes">
+            <li><span class="exit e0">exit 0</span><span>The note's markdown, nothing else, so you can pipe it.</span></li>
+            <li><span class="exit e2">exit 2</span><span>No such note: <i>No note #9. You have 3 notes.</i></span></li>
+            <li><span class="exit e2">exit 2</span><span><code>0</code> or a non-number is rejected by Click itself.</span></li>
+          </ul>
+          <div class="tip">📋 Copy a note to the clipboard on macOS: <code>second_brain show 1 | pbcopy</code>. Numbers shift when you add a note, so run <code>list</code> again if you're unsure.</div>
+        </div>
+
+        <!-- help -->
+        <div class="panel card" role="tabpanel" id="panel-help" aria-labelledby="tab-help" style="--c: var(--help)" hidden>
+          <div class="panel-head"><span class="ico">🛟</span><div><h3>--help</h3><div class="usage mono">second_brain [COMMAND] --help</div></div></div>
+          <p>Stuck? Every command explains itself. Click to ask:</p>
+          <div class="chips" style="margin: 12px 0">
+            <button class="chip" data-cmd="--help" style="--c: var(--help)">second_brain --help</button>
+            <button class="chip" data-cmd="new --help" style="--c: var(--new)">new --help</button>
+            <button class="chip" data-cmd="list --help" style="--c: var(--list)">list --help</button>
+            <button class="chip" data-cmd="show --help" style="--c: var(--show)">show --help</button>
+            <button class="chip" data-cmd="" style="--c: var(--muted)">second_brain (no command)</button>
+          </div>
+          <ul class="outcomes">
+            <li><span class="exit e0">exit 0</span><span>You asked for help with <code>--help</code>.</span></li>
+            <li><span class="exit e2">exit 2</span><span>No command given, so it shows the same help but counts it as a usage error.</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="side">
+        <div class="term" id="demo">
+          <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="term-title">pretend terminal</span></div>
+          <pre id="termOut" aria-live="polite"></pre>
+          <form class="t-in" id="termForm">
+            <span class="prompt mono">$</span>
+            <input id="termIn" type="text" autocomplete="off" spellcheck="false" placeholder='second_brain new "Hello brain"' aria-label="Type a command">
+          </form>
+        </div>
+        <div class="folder card">
+          <div class="folder-head"><span class="ico">📁</span><b>~/second_brain/</b><span class="count" id="count"></span></div>
+          <ul class="files" id="files"></ul>
+          <div class="folder-actions">
+            <button class="btn ghost" id="emptyBtn">🧹 Empty the folder</button>
+            <button class="btn ghost" id="resetBtn">↺ Restore sample notes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= Settings & exit codes ======================= -->
+  <section id="settings" class="wrap">
+    <h2><span class="emoji">🎛️</span>Settings and exit codes</h2>
+    <p class="lead">Set these in your shell or in a <code>.env</code> file in the folder you run the command from. Values already set in your shell win over <code>.env</code>.</p>
+    <div class="settings">
+      <div class="setting card"><span class="ico">📁</span><br><code>SECOND_BRAIN_DIR</code><p>Where notes are saved. Default <code>~/second_brain</code>. Created on the first <code>new</code>.</p></div>
+      <div class="setting card"><span class="ico">🔊</span><br><code>LOG_LEVEL</code><p>How chatty the terminal logs are. Default <code>INFO</code>. Try <code>DEBUG</code>.</p></div>
+      <div class="setting card"><span class="ico">📜</span><br><code>LOG_FILE</code><p>Where the detailed log goes. Default <code>app.log</code>, rotated at 50 KB.</p></div>
+    </div>
+    <div class="exit-row">
+      <div class="exit-card card"><span class="big">✅</span><div><span class="exit e0">exit 0</span><p>It worked: saved, listed, shown, or help you asked for.</p></div></div>
+      <div class="exit-card card"><span class="big">⚠️</span><div><span class="exit e2">exit 2</span><p>Something in the command is off. The message tells you what.</p></div></div>
+      <div class="exit-card card"><span class="big">💥</span><div><span class="exit e1">exit 1</span><p>Something unexpected broke. The full traceback is written to the log.</p></div></div>
+    </div>
+  </section>
+
+  <!-- ======================= Code explorer ======================= -->
+  <section id="code" class="wrap">
+    <h2><span class="emoji">🔍</span>What's inside <code>src/</code></h2>
+    <p class="lead">The whole app is four small files. Click any file or folder to see what it does, then follow a command as it travels through the code.</p>
+
+    <div class="code-grid">
+      <div class="tree-card card">
+        <ul class="tree" id="tree">
+          <li><button class="node" data-file="src" style="--c: var(--disk)"><span class="ico">🗃️</span><span class="nm">src/</span></button>
+            <ul>
+              <li><button class="node" data-file="second_brain" style="--c: var(--brain)"><span class="ico">🧠</span><span class="nm">second_brain/</span></button>
+                <ul>
+                  <li><button class="node" data-file="__init__.py" style="--c: var(--init)"><span class="ico">🏷️</span><span class="nm">__init__.py</span><span class="ln">0 lines</span></button></li>
+                  <li><button class="node" data-file="__main__.py" style="--c: var(--main)"><span class="ico">🚪</span><span class="nm">__main__.py</span><span class="ln">3 lines</span></button></li>
+                  <li><button class="node" data-file="app.py" style="--c: var(--app)"><span class="ico">🎛️</span><span class="nm">app.py</span><span class="ln">128 lines</span></button></li>
+                  <li><button class="node" data-file="notes.py" style="--c: var(--notes)"><span class="ico">🗂️</span><span class="nm">notes.py</span><span class="ln">89 lines</span></button></li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ul>
+        <p class="tree-note">🎛️ <b>app.py</b> talks to you. 🗂️ <b>notes.py</b> talks to the disk.</p>
+      </div>
+      <div id="detail" class="detail card" aria-live="polite"></div>
+    </div>
+
+    <div class="trace card">
+      <div class="trace-top">
+        <b>🚂 Follow a command:</b>
+        <button class="chip" data-trace="new" style="--c: var(--new)">✍️ new</button>
+        <button class="chip" data-trace="list" style="--c: var(--list)">📋 list</button>
+        <button class="chip" data-trace="show" style="--c: var(--show)">👀 show</button>
+        <button class="btn" id="playTrace" style="--c: var(--brain); margin-left: auto; padding: 6px 14px">▶ Play</button>
+      </div>
+      <ol class="trace-steps" id="traceSteps"></ol>
+      <p class="trace-caption" id="traceCaption"></p>
+    </div>
+  </section>
+</main>
+
+<footer class="wrap">🧠 second_brain: plain markdown, nothing fancy. Run <code>uv run second_brain --help</code> to start.</footer>
+
+<script>
+(() => {
+  "use strict";
+
+  // ---------- Theme toggle ----------
+  const root = document.documentElement;
+  const themeBtn = document.getElementById("themeToggle");
+  try {
+    const saved = localStorage.getItem("sb-theme");
+    if (saved) root.dataset.theme = saved;
+  } catch (e) {}
+  themeBtn.addEventListener("click", () => {
+    const dark = root.dataset.theme
+      ? root.dataset.theme === "dark"
+      : matchMedia("(prefers-color-scheme: dark)").matches;
+    root.dataset.theme = dark ? "light" : "dark";
+    try { localStorage.setItem("sb-theme", root.dataset.theme); } catch (e) {}
+  });
+
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+  // ---------- A faithful little model of the app ----------
+  const HOME = "/Users/you/second_brain";
+  const MAX_SLUG_LENGTH = 50;
+
+  const pad = (n) => String(n).padStart(2, "0");
+  const stamp = (d) =>
+    `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
+
+  // Mirrors notes.slugify
+  function slugify(text) {
+    const slug = text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+    return slug.slice(0, MAX_SLUG_LENGTH).replace(/-+$/, "");
+  }
+  // Mirrors notes.note_filename
+  function noteFilename(text, now) {
+    let stem = stamp(now);
+    const slug = slugify(text);
+    if (slug) stem += `-${slug}`;
+    return `${stem}.md`;
+  }
+  // Mirrors notes.render_note
+  function renderNote(text) {
+    const t = text.trim();
+    const heading = t.split(/\r\n|\r|\n/)[0];
+    return `# ${heading}\n\n${t}\n`;
+  }
+
+  const SAMPLES = [
+    ["2026-10-28-143012", "My brilliant idea about caching"],
+    ["2026-10-31-091500", "Try the new ramen place"],
+    ["2026-11-01-200245", "Book idea: a cat who runs a bakery"],
+  ];
+  const sampleNotes = () =>
+    SAMPLES.map(([ts, text]) => ({ name: `${ts}-${slugify(text)}.md`, content: renderNote(text) }));
+
+  let notes = sampleNotes();
+  let justAdded = null;
+
+  // Mirrors notes.save_note
+  function saveNote(text, now) {
+    const base = noteFilename(text, now);
+    let name = base;
+    let suffix = 2;
+    while (notes.some((n) => n.name === name)) {
+      name = base.replace(/\.md$/, `-${suffix}.md`);
+      suffix += 1;
+    }
+    notes.push({ name, content: renderNote(text) });
+    return name;
+  }
+  // Mirrors notes.list_notes: newest first by file name
+  const listNotes = () => [...notes].sort((a, b) => (a.name < b.name ? 1 : a.name > b.name ? -1 : 0));
+
+  // ---------- Click-like command runner ----------
+  const GROUP_USAGE = "second_brain [OPTIONS] COMMAND [ARGS]...";
+  const GROUP_HELP =
+`Usage: ${GROUP_USAGE}
+
+  Second brain: capture quick thoughts as markdown.
+
+Options:
+  --help  Show this message and exit.
+
+Commands:
+  list  List saved notes, newest first.
+  new   Save TEXT as a new markdown note.
+  show  Print note NUMBER, as numbered by \`second_brain list\`.`;
+
+  const COMMANDS = {
+    new: { usage: "second_brain new [OPTIONS] TEXT", doc: "Save TEXT as a new markdown note.", args: ["TEXT"] },
+    list: { usage: "second_brain list [OPTIONS]", doc: "List saved notes, newest first.", args: [] },
+    show: { usage: "second_brain show [OPTIONS] NUMBER", doc: "Print note NUMBER, as numbered by `second_brain list`.", args: ["NUMBER"] },
+  };
+  const cmdHelp = (c) => `Usage: ${c.usage}\n\n  ${c.doc}\n\nOptions:\n  --help  Show this message and exit.`;
+  const usageError = (usage, prog, msg) => ({
+    out: [{ text: `Usage: ${usage}\nTry '${prog} --help' for help.\n\n` }, { text: `Error: ${msg}`, cls: "t-err" }],
+    exit: 2,
+  });
+  const ok = (text, cls) => ({ out: [{ text, cls }], exit: 0 });
+
+  function run(args) {
+    // Group-level options come before the command name.
+    if (!args.length) return { out: [{ text: GROUP_HELP }], exit: 2 };
+    if (args[0].startsWith("-") && args[0].length > 1) {
+      if (args[0] === "--help") return ok(GROUP_HELP);
+      return usageError(GROUP_USAGE, "second_brain", `No such option '${args[0]}'.`);
+    }
+
+    const name = args[0];
+    const cmd = COMMANDS[name];
+    if (!cmd) return usageError(GROUP_USAGE, "second_brain", `No such command '${name}'.`);
+    const prog = `second_brain ${name}`;
+    const fail = (msg) => usageError(cmd.usage, prog, msg);
+
+    const positional = [];
+    let help = false;
+    let dashdash = false;
+    for (const a of args.slice(1)) {
+      if (!dashdash && a === "--") { dashdash = true; continue; }
+      if (!dashdash && a.startsWith("-") && a.length > 1) {
+        if (a === "--help") { help = true; continue; }
+        return fail(`No such option '${a}'.`);
+      }
+      positional.push(a);
+    }
+    if (help) return ok(cmdHelp(cmd));
+    if (positional.length < cmd.args.length) return fail(`Missing argument '${cmd.args[0]}'.`);
+
+    let number;
+    if (name === "show") {
+      const raw = positional[0];
+      if (!/^\s*\+?\d+\s*$/.test(raw)) return fail(`Invalid value for 'NUMBER': '${raw}' is not a valid integer range.`);
+      number = parseInt(raw, 10);
+      if (number < 1) return fail(`Invalid value for 'NUMBER': ${number} is not in the range x>=1.`);
+    }
+    const extra = positional.slice(cmd.args.length);
+    if (extra.length) return fail(`Got unexpected extra argument${extra.length > 1 ? "s" : ""} (${extra.join(" ")})`);
+
+    if (name === "new") {
+      const text = positional[0];
+      if (!text.trim()) return fail("A note can't be empty.");
+      const saved = saveNote(text, new Date());
+      justAdded = saved;
+      return ok(`Saved ${HOME}/${saved}`, "t-ok");
+    }
+    if (name === "list") {
+      const all = listNotes();
+      const lines = [`Notes in ${HOME}:`];
+      if (!all.length) lines.push("No notes yet.");
+      all.forEach((n, k) => lines.push(`${k + 1}. ${n.name}`));
+      return ok(lines.join("\n"));
+    }
+    // show
+    const all = listNotes();
+    if (number > all.length) {
+      const noun = all.length === 1 ? "note" : "notes";
+      return fail(`No note #${number}. You have ${all.length} ${noun}. Run 'second_brain list' to see them.`);
+    }
+    return ok(all[number - 1].content.replace(/\n$/, ""));
+  }
+
+  // ---------- Pretend terminal ----------
+  const termOut = document.getElementById("termOut");
+  const termIn = document.getElementById("termIn");
+  const history = [];
+  let histPos = 0;
+
+  const quote = (a) => (/^[A-Za-z0-9_\-.\/=+]+$/.test(a) ? a : `"${a.replace(/(["\\$`])/g, "\\$1")}"`);
+
+  // Small shell-style tokenizer: spaces split words, quotes group them.
+  function tokenize(line) {
+    const out = [];
+    let cur = "", inTok = false, q = null;
+    for (let i = 0; i < line.length; i++) {
+      const c = line[i];
+      if (q) {
+        if (c === q) q = null;
+        else if (c === "\\" && q === '"' && /["\\$`]/.test(line[i + 1] || "")) cur += line[++i];
+        else cur += c;
+      } else if (c === "'" || c === '"') { q = c; inTok = true; }
+      else if (c === "\\" && i + 1 < line.length) { cur += line[++i]; inTok = true; }
+      else if (/\s/.test(c)) { if (inTok) { out.push(cur); cur = ""; inTok = false; } }
+      else { cur += c; inTok = true; }
+    }
+    if (q) return null;
+    if (inTok) out.push(cur);
+    return out;
+  }
+
+  function print(cmdLine, result) {
+    let html = `<span class="prompt">$</span> ${esc(cmdLine)}\n`;
+    for (const part of result.out) {
+      html += part.cls ? `<span class="${part.cls}">${esc(part.text)}</span>` : esc(part.text);
+    }
+    html += `\n<span class="t-pill p${result.exit}">exit ${result.exit}</span>\n`;
+    termOut.insertAdjacentHTML("beforeend", html);
+    termOut.scrollTop = termOut.scrollHeight;
+    renderFolder();
+  }
+
+  function execLine(line) {
+    const trimmed = line.trim();
+    if (!trimmed) return;
+    if (trimmed === "clear") { termOut.innerHTML = ""; return; }
+    let tokens = tokenize(trimmed);
+    if (tokens === null) return print(trimmed, { out: [{ text: "zsh: unmatched quote", cls: "t-err" }], exit: 1 });
+    if (tokens[0] === "uv" && tokens[1] === "run") tokens = tokens.slice(2);
+    else if (/^python3?$/.test(tokens[0]) && tokens[1] === "-m") tokens = tokens.slice(2);
+    if (tokens[0] !== "second_brain") {
+      return print(trimmed, { out: [{ text: `zsh: command not found: ${tokens[0] || ""}`, cls: "t-err" }], exit: 127 });
+    }
+    print(trimmed, run(tokens.slice(1)));
+  }
+
+  const runArgs = (args) => execLine(["second_brain", ...args].map(quote).join(" "));
+
+  document.getElementById("termForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const line = termIn.value;
+    if (line.trim()) { history.push(line); histPos = history.length; }
+    termIn.value = "";
+    execLine(line);
+  });
+  termIn.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowUp" && histPos > 0) { histPos -= 1; termIn.value = history[histPos]; e.preventDefault(); }
+    if (e.key === "ArrowDown") {
+      histPos = Math.min(history.length, histPos + 1);
+      termIn.value = history[histPos] || "";
+      e.preventDefault();
+    }
+  });
+
+  termOut.innerHTML =
+    `<span class="t-dim"># Welcome! Click the buttons, or type a command below.\n# Try: second_brain new "Hello brain", then list, then show 1\n# Press ↑ for history and type "clear" to start over.</span>\n\n`;
+
+  // ---------- Folder view ----------
+  const filesEl = document.getElementById("files");
+  const countEl = document.getElementById("count");
+  function renderFolder() {
+    const all = listNotes();
+    countEl.textContent = `${all.length} ${all.length === 1 ? "note" : "notes"} · newest first`;
+    if (!all.length) {
+      filesEl.innerHTML = `<li class="empty-folder">Empty. <code>list</code> would say “No notes yet.”</li>`;
+      return;
+    }
+    filesEl.innerHTML = all.map((n, k) =>
+      `<li><button class="note${n.name === justAdded ? " pop" : ""}" data-num="${k + 1}" title="Run: second_brain show ${k + 1}">
+        <span class="num">${k + 1}</span><span class="nm">📝 ${esc(n.name)}</span></button></li>`).join("");
+    justAdded = null;
+  }
+  filesEl.addEventListener("click", (e) => {
+    const b = e.target.closest(".note");
+    if (!b) return;
+    selectTab("show");
+    document.getElementById("showNum").value = b.dataset.num;
+    runArgs(["show", b.dataset.num]);
+  });
+  document.getElementById("emptyBtn").addEventListener("click", () => { notes = []; renderFolder(); renderNewPreview(); });
+  document.getElementById("resetBtn").addEventListener("click", () => { notes = sampleNotes(); renderFolder(); renderNewPreview(); });
+
+  // ---------- Tabs ----------
+  const tabs = [...document.querySelectorAll(".tab")];
+  function selectTab(name) {
+    tabs.forEach((t) => {
+      const on = t.dataset.tab === name;
+      t.setAttribute("aria-selected", on);
+      t.tabIndex = on ? 0 : -1;
+      document.getElementById(t.getAttribute("aria-controls")).hidden = !on;
+    });
+  }
+  tabs.forEach((t, k) => {
+    t.addEventListener("click", () => selectTab(t.dataset.tab));
+    t.addEventListener("keydown", (e) => {
+      const d = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
+      if (!d) return;
+      const next = tabs[(k + d + tabs.length) % tabs.length];
+      selectTab(next.dataset.tab);
+      next.focus();
+    });
+  });
+  document.querySelectorAll("[data-go]").forEach((b) =>
+    b.addEventListener("click", () => {
+      selectTab(b.dataset.go);
+      document.getElementById("play").scrollIntoView();
+    }));
+
+  // ---------- new: live preview ----------
+  const newText = document.getElementById("newText");
+  const newName = document.getElementById("newName");
+  const newPaper = document.getElementById("newPaper");
+  function renderNewPreview() {
+    const text = newText.value;
+    if (!text.trim()) {
+      newName.innerHTML = `📄 <span class="t-dim">(no file: an empty note is rejected)</span>`;
+      newPaper.className = "paper mono empty";
+      newPaper.textContent = "Type a thought above…";
+      return;
+    }
+    const slug = slugify(text);
+    newName.innerHTML = `📄 ${esc(stamp(new Date()))}${slug ? `-<span class="slug">${esc(slug)}</span>` : ""}.md`;
+    const content = renderNote(text);
+    const [first, ...rest] = content.split("\n");
+    newPaper.className = "paper mono";
+    newPaper.innerHTML = `<span class="h1">${esc(first)}</span>\n${esc(rest.join("\n"))}`;
+  }
+  newText.addEventListener("input", renderNewPreview);
+  setInterval(renderNewPreview, 1000);
+  document.getElementById("newForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    runArgs(["new", newText.value]);
+  });
+
+  // ---------- list / show / help ----------
+  document.getElementById("runList").addEventListener("click", () => runArgs(["list"]));
+  document.getElementById("showForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    runArgs(["show", document.getElementById("showNum").value]);
+  });
+  document.querySelectorAll("[data-show]").forEach((b) =>
+    b.addEventListener("click", () => {
+      document.getElementById("showNum").value = b.dataset.show;
+      runArgs(["show", b.dataset.show]);
+    }));
+  document.querySelectorAll("[data-cmd]").forEach((b) =>
+    b.addEventListener("click", () => runArgs(b.dataset.cmd ? b.dataset.cmd.split(" ") : [])));
+
+  // ---------- Code explorer ----------
+  const FILES = {
+    "src": {
+      icon: "🗃️", color: "--disk", role: "The source folder", lines: "",
+      summary: "Holds the code that gets installed. Keeping the package inside <code>src/</code> (the “src layout”) means tests run against the installed package, not loose files in the project folder.",
+      sections: [["Contains", ["second_brain/"]]],
+    },
+    "second_brain": {
+      icon: "🧠", color: "--brain", role: "The Python package", lines: "220 lines in total",
+      summary: "Everything the app does lives in this one package. <b>app.py</b> faces you (commands, messages, logs) and <b>notes.py</b> faces the disk (folders, file names, markdown).",
+      sections: [["Files", ["__init__.py", "__main__.py", "app.py", "notes.py"]]],
+    },
+    "__init__.py": {
+      icon: "🏷️", color: "--init", role: "Package marker", lines: "0 lines",
+      summary: "An empty file. Its only job is to mark <code>second_brain</code> as a Python package, so imports like <code>from second_brain.app import main</code> work.",
+      code: "# (this file is intentionally empty)",
+    },
+    "__main__.py": {
+      icon: "🚪", color: "--main", role: "The python -m doorway", lines: "3 lines",
+      summary: "Runs when you type <code>python -m second_brain</code>. It imports <code>main()</code> from app.py and calls it. The <code>second_brain</code> command itself comes from <code>pyproject.toml</code>, which points at the same <code>app:main</code>.",
+      imports: ["second_brain.app"],
+      talks: ["app.py"],
+      code: "from second_brain.app import main\n\nmain()",
+    },
+    "app.py": {
+      icon: "🎛️", color: "--app", role: "Commands, messages and logging", lines: "128 lines",
+      summary: "The part you talk to. It builds the command line with <b>Click</b>, loads <code>.env</code> with <b>python-dotenv</b>, and sets up compact logs with <b>loguru</b> (3-letter levels like <code>INF</code> and <code>DBG</code>). It turns problems into friendly usage errors (exit 2) and logs real crashes (exit 1).",
+      fns: [
+        ["main()", "Entry point. Runs the CLI; on a crash it logs the traceback and exits 1."],
+        ["cli()", "The Click group. Loads .env and sets up logging."],
+        ["new(text)", "Saves a note and prints “Saved …”."],
+        ["list_command()", "Prints the folder path and the numbered notes."],
+        ["show(number)", "Prints one note, or explains why it can't."],
+        ["configure_logging()", "Console logs at LOG_LEVEL, file logs at DEBUG in LOG_FILE."],
+        ["short_level(name)", "INFO → INF, WARNING → WRN, …"],
+        ["_add_short_level()", "Puts the short level on every log record."],
+        ["_exit_with_error()", "Turns a logged crash into exit code 1."],
+      ],
+      imports: ["click", "loguru", "python-dotenv", "sys", "datetime", "second_brain.notes"],
+      talks: ["notes.py", ".env", "app.log", "your terminal"],
+      code:
+`@cli.command()
+@click.argument("text")
+def new(text):
+    """Save TEXT as a new markdown note."""
+    try:
+        path = save_note(text, notes_dir(), datetime.now())
+    except ValueError as exc:
+        raise click.UsageError(str(exc)) from exc
+    logger.debug("Saved note {}", path)
+    click.echo(f"Saved {path}")`,
+    },
+    "notes.py": {
+      icon: "🗂️", color: "--notes", role: "Where and how notes are stored", lines: "89 lines",
+      summary: "Plain logic with no printing and no Click. It decides where notes live, builds file names, writes markdown without ever overwriting, and finds notes newest first. That makes it easy to test.",
+      fns: [
+        ["notes_dir()", "SECOND_BRAIN_DIR (with ~ expanded), or ~/second_brain."],
+        ["slugify(text)", "“Buy a keyboard!” → buy-a-keyboard (max 50 chars)."],
+        ["note_filename()", "2026-11-02-163019-buy-a-keyboard.md"],
+        ["render_note(text)", "“# first line”, a blank line, then the full text."],
+        ["save_note()", "Writes the file and adds -2, -3, … if the name is taken."],
+        ["list_notes()", "Top-level, non-hidden *.md files, newest first."],
+        ["note_by_number()", "Note N from that list (1-based), or None."],
+      ],
+      imports: ["os", "re", "pathlib"],
+      talks: ["app.py", "~/second_brain/*.md"],
+      code:
+`def slugify(text):
+    """Turn text into a lowercase, dash-separated slug of at most 50 chars."""
+    slug = re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")
+    return slug[:MAX_SLUG_LENGTH].rstrip("-")`,
+    },
+  };
+
+  const detail = document.getElementById("detail");
+  const nodes = [...document.querySelectorAll(".node")];
+  const chip = (label, key) =>
+    FILES[key]
+      ? `<button class="chip" data-jump="${esc(key)}" style="--c: var(${FILES[key].color})">${esc(label)}</button>`
+      : `<span class="chip">${esc(label)}</span>`;
+
+  function showFile(key) {
+    const f = FILES[key];
+    nodes.forEach((n) => n.setAttribute("aria-pressed", n.dataset.file === key));
+    let html = `<div class="detail-head"><span class="big">${f.icon}</span><div><h3>${esc(key)}</h3><p class="role">${esc(f.role)}</p></div>${f.lines ? `<span class="ln">${esc(f.lines)}</span>` : ""}</div>`;
+    html += `<p>${f.summary}</p>`;
+    if (f.fns) html += `<h4>Functions</h4><ul class="fns">${f.fns.map(([n, d]) => `<li><code>${esc(n)}</code><span>${esc(d)}</span></li>`).join("")}</ul>`;
+    (f.sections || []).forEach(([title, items]) => {
+      html += `<h4>${esc(title)}</h4><div class="chips">${items.map((i) => chip(i, i.replace(/\/$/, ""))).join("")}</div>`;
+    });
+    if (f.imports) html += `<h4>Imports</h4><div class="chips">${f.imports.map((i) => `<span class="chip">${esc(i)}</span>`).join("")}</div>`;
+    if (f.talks) html += `<h4>Talks to</h4><div class="chips">${f.talks.map((t) => chip(t, t)).join("")}</div>`;
+    if (f.code) html += `<details><summary>👩‍💻 Peek at the code</summary><pre>${esc(f.code)}</pre></details>`;
+    detail.style.setProperty("--c", `var(${f.color})`);
+    detail.innerHTML = html;
+    // restart the fade-in animation
+    detail.style.animation = "none";
+    void detail.offsetWidth;
+    detail.style.animation = "";
+  }
+  nodes.forEach((n) => n.addEventListener("click", () => showFile(n.dataset.file)));
+  detail.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-jump]");
+    if (b) showFile(b.dataset.jump);
+  });
+  showFile("app.py");
+
+  // ---------- Follow a command ----------
+  const WHO = {
+    you: { color: "--you", file: null, tag: "you" },
+    main: { color: "--main", file: "__main__.py", tag: "entry" },
+    app: { color: "--app", file: "app.py", tag: "app.py" },
+    notes: { color: "--notes", file: "notes.py", tag: "notes.py" },
+    disk: { color: "--disk", file: null, tag: "disk" },
+  };
+  const start = (cmd) => [
+    ["you", cmd, `You type <code>${esc(cmd)}</code> in your terminal.`],
+    ["main", "entry point", "The <code>second_brain</code> script from <code>pyproject.toml</code> calls <code>app.main()</code>. With <code>python -m second_brain</code>, <b>__main__.py</b> does the same."],
+    ["app", "main()", "<b>main()</b> starts the CLI and keeps watch: if anything crashes, the traceback is logged and the exit code is 1."],
+    ["app", "cli()", "The Click group <b>cli()</b> loads <code>.env</code> and sets up logging, then hands over to the command."],
+  ];
+  const TRACES = {
+    new: [
+      ...start('second_brain new "Buy a keyboard!"'),
+      ["app", "new(text)", "Click passes <code>\"Buy a keyboard!\"</code> to <b>new()</b>."],
+      ["notes", "notes_dir()", "Where do notes live? <code>SECOND_BRAIN_DIR</code> if set, otherwise <code>~/second_brain</code>."],
+      ["notes", "save_note()", "<b>save_note()</b> asks <b>note_filename()</b> and <b>slugify()</b> for <code>…-buy-a-keyboard.md</code>, and <b>render_note()</b> for the markdown."],
+      ["disk", "write .md", "The file is created, never overwritten. A taken name gets <code>-2</code>."],
+      ["app", "echo", "Back in app.py: it prints <code>Saved /Users/you/second_brain/…-buy-a-keyboard.md</code>. Exit code 0 🎉"],
+    ],
+    list: [
+      ...start("second_brain list"),
+      ["app", "list_command()", "Click runs <b>list_command()</b>. Its Python name avoids clashing with Python's built-in <code>list</code>."],
+      ["notes", "notes_dir()", "Finds the folder and turns it into a full, absolute path."],
+      ["notes", "list_notes()", "<b>list_notes()</b> keeps top-level, non-hidden <code>*.md</code> files and sorts them newest first."],
+      ["disk", "read folder", "Just a peek at the folder. A missing folder means an empty list, not an error."],
+      ["app", "echo", "Prints <code>Notes in …:</code> and <code>1. …</code>, <code>2. …</code>, or <i>No notes yet.</i> Exit code 0 🎉"],
+    ],
+    show: [
+      ...start("second_brain show 2"),
+      ["app", "show(number)", "Click already checked that <code>2</code> is a whole number ≥ 1. If not, it stops here with exit code 2."],
+      ["notes", "notes_dir()", "Finds the notes folder."],
+      ["notes", "note_by_number()", "<b>note_by_number()</b> calls <b>list_notes()</b> and picks the 2nd note, or <code>None</code> if there isn't one."],
+      ["disk", "read .md", "app.py reads the note as UTF-8. Broken bytes show up as <code>�</code> instead of crashing."],
+      ["app", "echo", "Prints the note exactly as stored. If there's no such note, it prints <i>No note #2…</i> with exit code 2."],
+    ],
+  };
+
+  const stepsEl = document.getElementById("traceSteps");
+  const captionEl = document.getElementById("traceCaption");
+  const playBtn = document.getElementById("playTrace");
+  let traceName = "new";
+  let traceIdx = 0;
+  let timer = null;
+
+  function renderTrace() {
+    const steps = TRACES[traceName];
+    stepsEl.innerHTML = steps.map(([who, label], k) => {
+      const w = WHO[who];
+      const cls = k === traceIdx ? "on" : k < traceIdx ? "done" : "";
+      return `<li><button class="tstep ${cls}" data-step="${k}" style="--c: var(${w.color})"><small>${esc(w.tag)}</small>${esc(label)}</button></li>`;
+    }).join("");
+    const [who, , caption] = steps[traceIdx];
+    captionEl.innerHTML = `<b>Step ${traceIdx + 1} of ${steps.length}.</b> ${caption}`;
+    const file = WHO[who].file;
+    nodes.forEach((n) => n.classList.toggle("tracing", n.dataset.file === file));
+    document.querySelectorAll("[data-trace]").forEach((b) =>
+      b.style.fontWeight = b.dataset.trace === traceName ? "800" : "");
+  }
+  function stop() {
+    clearInterval(timer);
+    timer = null;
+    playBtn.textContent = "▶ Play";
+  }
+  function play() {
+    if (timer) return stop();
+    if (traceIdx >= TRACES[traceName].length - 1) traceIdx = 0;
+    renderTrace();
+    playBtn.textContent = "⏸ Pause";
+    timer = setInterval(() => {
+      if (traceIdx >= TRACES[traceName].length - 1) return stop();
+      traceIdx += 1;
+      renderTrace();
+    }, 1800);
+  }
+  playBtn.addEventListener("click", play);
+  stepsEl.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-step]");
+    if (!b) return;
+    stop();
+    traceIdx = Number(b.dataset.step);
+    renderTrace();
+  });
+  document.querySelectorAll("[data-trace]").forEach((b) =>
+    b.addEventListener("click", () => {
+      stop();
+      traceName = b.dataset.trace;
+      traceIdx = 0;
+      play();
+    }));
+
+  // ---------- Initial render ----------
+  selectTab("new");
+  renderFolder();
+  renderNewPreview();
+  renderTrace();
+})();
+</script>
+</body>
+</html>
